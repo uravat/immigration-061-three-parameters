@@ -92,15 +92,59 @@ window.Quarto = {
 </header>
 
 
-<p>Attitudes towards immigration will play an important role in elections. Using data from a 2012 experiment among Boston commuters, we seek to explore the causal effect of exposure to Spanish speakers on attitudes toward immigration among registered voters in Georgia today.</p>
-<p>Attitudes and demographics since 2012 could have changed rendering our models biased.</p>
-<p><span class="math display">\[Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon\]</span></p>
-<p>with <span class="math inline">\(\epsilon \sim \mathcal{N}(0, \sigma^2)\)</span>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="immigration_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="immigration_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Attitudes towards immigration will play an important role in elections. Using data from a 2012 experiment among Boston commuters, we seek to explore the causal effect of exposure to Spanish speakers on attitudes toward immigration among registered voters in Georgia today. We model attitudes toward immigration, measured on a continuous scale 3 to 15, as a linear function of treatment assignment(being exposed to Spanish-speajers).</p>
+<p>Attitudes and demographics since 2012 could have changed rendering our models biased.</p>
+<p>The estimated average treatment effect shows that exposure to Spanish speakers increases pro-immigration attitudes by approximately 1.55 points, with a 95% confidence interval ranging from 0.53 to 2.57, suggesting a meaningful shift toward less conservative views on immigration.</p>
+<p>The estimates and confidence intervals might be inaccurate due to potential unmeasured confounding variables that affect both exposure to Spanish speakers and immigration attitudes. Additionally, measurement error in the outcome or treatment assignment could bias the results. The sample might not fully represent the target population, limiting generalizability.</p>
+<p>Another fundamental problem is that what we really care about is voting behavior. But the outcome we actually have data for is attitude toward immigration. We suspect that these things are correlated, that people with more conservative attitudes are more likely to vote Republican, but we have no data which demonstrates that.</p>
+<section id="analysis" class="level2">
+<h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
+<p><span class="math display">\[Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon\]</span></p>
+<p>with <span class="math inline">\(\epsilon \sim \mathcal{N}(0, \sigma^2)\)</span>.</p>
+<p>Fitting our model gives the parameter estimates and 95% confidence interavals</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Estimates and 95% Confidence Intervals for Parameters Source: Enos (2014)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">8.453125</td>
+<td style="text-align: right;">7.7652365</td>
+<td style="text-align: right;">9.141013</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">treatmentTreated</td>
+<td style="text-align: right;">1.546875</td>
+<td style="text-align: right;">0.5139189</td>
+<td style="text-align: right;">2.579831</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="immigration_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -109,6 +153,7 @@ window.Quarto = {
 <p><span class="math display">\[
 \hat{\text{att\_end}} = 8.45 + 1.55 \times \text{treatment}_{\text{Treated}}
 \]</span></p>
+</section>
 
 </main>
 <!-- /main column -->

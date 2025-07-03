@@ -12,30 +12,95 @@ library(tidyverse)
 library(primer.data)
 library(tidymodels)
 library(broom)
+library(marginaleffects)
 ```
 
-
-Attitudes towards immigration will play an important role in elections.  Using data from a 2012 experiment among Boston commuters, we seek to explore the causal effect of exposure to Spanish speakers on attitudes toward immigration among registered voters in Georgia today.
-
-Attitudes and demographics since 2012 could have changed rendering our models biased. 
-
-
-$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon$$
-
-with $\epsilon \sim \mathcal{N}(0, \sigma^2)$.
-
-After fitting our model
 ```{r}
 #| cache: true
 fit_att <- linear_reg(engine = "lm") |> 
   fit(att_end ~ treatment, data = trains)
+#tidy(fit_att, conf.int = TRUE) # for console to AI make a nice table showing estimates and conf int so i can paste into quarto
+```
 
+
+```{r}
+library(glue)
+
+# Generate comparison estimates and store in a tibble
+avg_df <- avg_comparisons(fit_att) |>
+  as_tibble() |>
+  mutate(term_label = "Treatment (Treated – Control)")
+
+# Create plot
+ggplot(avg_df, aes(x = term_label, y = estimate)) +
+  geom_point(size = 4, colour = "#2c7fb8") +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.12, colour = "#2c7fb8") +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+  labs(
+    title = "Causal effect of Exposure to Spanish Speakers on Immigration Attitudes",
+    subtitle = glue(
+      "Increase of about {round(avg_df$estimate, 2)} points in pro-immigration attitudes compared to controls (95% CI: {round(avg_df$conf.low, 2)} – {round(avg_df$conf.high, 2)})"
+    ),
+    x = NULL,
+    y = "Average Treatment Effect (points)",
+    caption = "Source: Enos (2014), Boston commuter field experiment"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_text(margin = margin(b = 10)),
+    axis.text.x = element_text(size = 12)
+  )
+
+```
+
+Attitudes towards immigration will play an important role in elections.  Using data from a 2012 experiment among Boston commuters, we seek to explore the causal effect of exposure to Spanish speakers on attitudes toward immigration among registered voters in Georgia today. We model attitudes toward immigration, measured on a continuous scale 3 to 15, as a linear function of treatment assignment(being exposed to Spanish-speajers).
+
+Attitudes and demographics since 2012 could have changed rendering our models biased. 
+
+The estimated average treatment effect shows that exposure to Spanish speakers increases pro-immigration attitudes by approximately 1.55 points, with a 95% confidence interval ranging from 0.53 to 2.57, suggesting a meaningful shift toward less conservative views on immigration.
+
+The estimates and confidence intervals might be inaccurate due to potential unmeasured confounding variables that affect both exposure to Spanish speakers and immigration attitudes. Additionally, measurement error in the outcome or treatment assignment could bias the results. The sample might not fully represent the target population, limiting generalizability.
+
+Another fundamental problem is that what we really care about is voting behavior. But the outcome we actually have data for is attitude toward immigration. We suspect that these things are correlated, that people with more conservative attitudes are more likely to vote Republican, but we have no data which demonstrates that.
+
+## Analysis 
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon$$
+
+with $\epsilon \sim \mathcal{N}(0, \sigma^2)$.
+
+Fitting our model gives the parameter estimates and 95% confidence interavals
+
+```{r}
+library(knitr)
+tidy(fit_att, conf.int = TRUE) |>
+  select(term, estimate, conf.low, conf.high) |>
+  kable(
+    caption = "Estimates and 95% Confidence Intervals for Parameters\nSource: Enos (2014)"
+  )
+```
+
+
+
+```{r}
 library(easystats)
 check_predictions(extract_fit_engine(fit_att))
+
+
 ```
+
 
 Based on the fitted model, we have 
 
 $$
 \hat{\text{att\_end}} = 8.45 + 1.55 \times \text{treatment}_{\text{Treated}}
 $$
+
+```{r}
+# in console
+#predictions(fit_att)
+#avg_predictions(fit_att, by = "treatment")
+#plot_predictions(fit_att, by = "treatment")
+#avg_comparisons(fit_att)
+```
+
