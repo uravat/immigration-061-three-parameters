@@ -1,0 +1,41 @@
+---
+title: "Immigration"
+format: html
+execute:
+  echo: false
+  message: false
+  warning: false
+---
+
+```{r}
+library(tidyverse)
+library(primer.data)
+library(tidymodels)
+library(broom)
+```
+
+
+Attitudes towards immigration will play an important role in elections.  Using data from a 2012 experiment among Boston commuters, we seek to explore the causal effect of exposure to Spanish speakers on attitudes toward immigration among registered voters in Georgia today.
+
+Attitudes and demographics since 2012 could have changed rendering our models biased. 
+
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon$$
+
+with $\epsilon \sim \mathcal{N}(0, \sigma^2)$.
+
+After fitting our model
+```{r}
+#| cache: true
+fit_att <- linear_reg(engine = "lm") |> 
+  fit(att_end ~ treatment, data = trains)
+
+library(easystats)
+check_predictions(extract_fit_engine(fit_att))
+```
+
+Based on the fitted model, we have 
+
+$$
+\hat{\text{att\_end}} = 8.45 + 1.55 \times \text{treatment}_{\text{Treated}}
+$$
